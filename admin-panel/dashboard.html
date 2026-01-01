@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin Panel</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Admin Panel</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="users.html" class="nav-item">
+                <span class="nav-icon">👥</span>
+                <span>User Management</span>
+            </a>
+            <a href="#" class="nav-item" id="logoutBtn">
+                <span class="nav-icon">🚪</span>
+                <span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <h1>Dashboard</h1>
+            <div class="admin-info">
+                <span id="adminName">Administrator</span>
+            </div>
+        </header>
+
+        <!-- Analytics Cards -->
+        <section class="analytics-section">
+            <div class="analytics-grid">
+                <div class="analytics-card card-primary">
+                    <div class="card-icon">👥</div>
+                    <div class="card-content">
+                        <h3 id="totalUsers">0</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+
+                <div class="analytics-card card-success">
+                    <div class="card-icon">✅</div>
+                    <div class="card-content">
+                        <h3 id="approvedUsers">0</h3>
+                        <p>Approved Users</p>
+                    </div>
+                </div>
+
+                <div class="analytics-card card-warning">
+                    <div class="card-icon">⏳</div>
+                    <div class="card-content">
+                        <h3 id="pendingUsers">0</h3>
+                        <p>Pending Approval</p>
+                    </div>
+                </div>
+
+                <div class="analytics-card card-danger">
+                    <div class="card-icon">❌</div>
+                    <div class="card-content">
+                        <h3 id="rejectedUsers">0</h3>
+                        <p>Rejected Users</p>
+                    </div>
+                </div>
+
+                <div class="analytics-card card-info">
+                    <div class="card-icon">🔥</div>
+                    <div class="card-content">
+                        <h3 id="activeUsers">0</h3>
+                        <p>Active Users (7d)</p>
+                    </div>
+                </div>
+
+                <div class="analytics-card card-secondary">
+                    <div class="card-icon">📈</div>
+                    <div class="card-content">
+                        <h3 id="approvalRate">0%</h3>
+                        <p>Approval Rate</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pending Users Section -->
+        <section class="pending-section">
+            <div class="section-header">
+                <h2>Users Waiting for Approval</h2>
+                <a href="users.html?status=pending" class="btn btn-primary">View All Pending</a>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="pendingUsersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Payment Method</th>
+                            <th>Registered</th>
+                            <th>Renewal Date</th>
+                            <th>Screenshot</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingUsersBody">
+                        <tr>
+                            <td colspan="7" class="text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Recent Users Section -->
+        <section class="recent-section">
+            <div class="section-header">
+                <h2>Recent Registrations</h2>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="recentUsersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentUsersBody">
+                        <tr>
+                            <td colspan="4" class="text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Payment Screenshot Modal -->
+    <div id="screenshotModal" class="modal">
+        <div class="modal-overlay" onclick="closeModal('screenshotModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Payment Screenshot</h3>
+                <button class="modal-close" onclick="closeModal('screenshotModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="screenshotImage" src="" alt="Payment Screenshot" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject User Modal -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-overlay" onclick="closeModal('rejectModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reject User</h3>
+                <button class="modal-close" onclick="closeModal('rejectModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label for="rejectReason" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Rejection Reason:</label>
+                <textarea 
+                    id="rejectReason" 
+                    rows="4" 
+                    placeholder="Enter reason for rejection..."
+                    style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; resize: vertical;"
+                ></textarea>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 1rem; justify-content: flex-end; padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb;">
+                <button class="btn btn-secondary" onclick="closeModal('rejectModal')">Cancel</button>
+                <button class="btn btn-danger" onclick="rejectUser()">Reject User</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
