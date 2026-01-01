@@ -1,313 +1,176 @@
-# LinkedIn Design Tool - Backend & Admin Panel
+# LinkedIn Design Tool - Backend API
 
-Complete backend API and admin panel for the LinkedIn Design Tool application.
+RESTful API backend for the LinkedIn Design Tool web application with user authentication, admin panel, and payment verification system.
+
+## 🌟 Features
+
+### Core Functionality
+- **User Authentication** - JWT-based login/register
+- **Payment Verification** - Manual approval workflow with screenshot upload
+- **Admin Panel** - Dashboard for user management
+- **Role-Based Access** - User and admin roles
+- **Subscription Tracking** - 30-day renewal system
+- **File Upload** - Secure payment screenshot storage
+- **MongoDB Database** - User and admin data persistence
+
+### API Endpoints
+
+#### Authentication (`/api/auth`)
+- `POST /register` - User registration with payment upload
+- `POST /login` - User login
+- `GET /status` - Check authentication status
+
+#### User Routes (`/api/user`)
+- `GET /profile` - Get user profile
+- `PUT /profile` - Update user profile
+- `GET /design-access` - Verify designer access permission
+
+#### Admin Routes (`/api/admin`)
+- `POST /login` - Admin login
+- `GET /dashboard` - Dashboard analytics
+- `GET /users` - List all users (with filters)
+- `GET /users/:id` - Get specific user
+- `POST /users/:id/approve` - Approve user (sets 30-day subscription)
+- `POST /users/:id/reject` - Reject user with reason
+- `DELETE /users/:id` - Delete user
+
+### Admin Panel
+- **Login Page** - Secure admin authentication
+- **Dashboard** - Analytics and pending approvals
+- **User Management** - View, approve, reject, delete users
+- **Subscription Tracking** - View renewal dates and days remaining
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 16+ and npm
+- MongoDB 4.4+
+- Git
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/YOUR-USERNAME/linkedin-design-tool-backend.git
+cd linkedin-design-tool-backend
+```
+
+2. **Install dependencies**
+```bash
+npm install
+```
+
+3. **Create environment file**
+```bash
+cp .env.example .env
+```
+
+4. **Configure `.env` file**
+```env
+# Database
+MONGODB_URI=mongodb://localhost:27017/linkedin-design-tool
+
+# JWT Secrets (CHANGE THESE!)
+JWT_SECRET=your-super-secret-jwt-key-here
+JWT_EXPIRE=7d
+ADMIN_JWT_SECRET=your-admin-jwt-secret-here
+
+# Admin Credentials (CHANGE THESE!)
+ADMIN_EMAIL=your-admin@example.com
+ADMIN_PASSWORD=YourSecurePassword123!
+ADMIN_NAME=Admin Name
+
+# Server
+PORT=5000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5000
+```
+
+5. **Start MongoDB**
+```bash
+# Windows
+net start MongoDB
+
+# macOS/Linux
+sudo systemctl start mongod
+```
+
+6. **Create admin account**
+```bash
+npm run seed
+```
+
+7. **Start the server**
+```bash
+npm start
+```
+
+Server runs at: `http://localhost:5000`
 
 ## 📁 Project Structure
 
 ```
 backend/
-├── server.js                 # Main server file
-├── package.json             # Dependencies
-├── .env                     # Environment variables (create from .env.example)
-├── .env.example            # Environment template
+├── server.js                  # Main server file
+├── package.json              # Dependencies
+├── .env.example              # Environment template
+├── .gitignore               # Git ignore rules
+│
 ├── config/
-│   └── db.js               # MongoDB connection
+│   └── db.js                # MongoDB connection
+│
 ├── models/
-│   ├── User.js             # User model
-│   └── Admin.js            # Admin model
-├── middleware/
-│   ├── auth.js             # JWT authentication
-│   ├── adminAuth.js        # Admin authentication
-│   └── upload.js           # File upload handler
-├── routes/
-│   ├── auth.js             # Authentication routes
-│   ├── user.js             # User routes
-│   └── admin.js            # Admin routes
+│   ├── User.js              # User schema
+│   └── Admin.js             # Admin schema
+│
 ├── controllers/
-│   ├── authController.js   # Auth logic
-│   ├── userController.js   # User logic
-│   └── adminController.js  # Admin logic
+│   ├── authController.js    # Auth logic
+│   ├── userController.js    # User operations
+│   └── adminController.js   # Admin operations
+│
+├── middleware/
+│   ├── auth.js              # User JWT verification
+│   ├── adminAuth.js         # Admin JWT verification
+│   └── upload.js            # File upload config
+│
+├── routes/
+│   ├── auth.js              # Auth routes
+│   ├── user.js              # User routes
+│   └── admin.js             # Admin routes
+│
 ├── scripts/
-│   └── seedAdmin.js        # Create default admin
+│   └── seedAdmin.js         # Create admin user
+│
 ├── uploads/
-│   └── payment-screenshots/ # Uploaded payment screenshots
-└── admin-panel/            # Admin panel frontend
-    ├── index.html          # Admin login
-    ├── dashboard.html      # Dashboard
+│   └── payment-screenshots/ # Uploaded files
+│
+└── admin-panel/
+    ├── index.html           # Admin login
+    ├── dashboard.html       # Dashboard
     ├── users.html          # User management
     ├── css/
-    │   └── admin.css
+    │   └── admin.css       # Admin styles
     └── js/
-        ├── login.js
-        ├── dashboard.js
-        └── users.js
+        ├── login.js        # Login handler
+        ├── dashboard.js    # Dashboard logic
+        └── users.js        # User management logic
 ```
 
-## 🚀 Quick Start
+## 🗄️ Database Schema
 
-### 1. Install MongoDB
-
-#### Windows:
-1. Download MongoDB Community Server from https://www.mongodb.com/try/download/community
-2. Install and start MongoDB service
-3. MongoDB will run on `mongodb://localhost:27017`
-
-#### Alternative: Use MongoDB Atlas (Cloud)
-1. Create free account at https://www.mongodb.com/cloud/atlas
-2. Create a cluster
-3. Get connection string
-4. Use it in `.env` file
-
-### 2. Setup Backend
-
-```powershell
-# Navigate to backend folder
-cd backend
-
-# Install dependencies
-npm install
-
-# Create .env file
-Copy-Item .env.example .env
-
-# Edit .env and configure:
-# - MONGODB_URI (if using Atlas, update the connection string)
-# - JWT_SECRET (change to a random string)
-# - JWT_ADMIN_SECRET (change to a different random string)
-# - ADMIN_EMAIL and ADMIN_PASSWORD (default admin credentials)
-```
-
-### 3. Create Default Admin
-
-```powershell
-npm run seed-admin
-```
-
-This will create an admin account with:
-- Email: `admin@linkedindesign.com`
-- Password: `Admin@123456`
-
-**⚠️ IMPORTANT: Change the password after first login!**
-
-### 4. Start the Server
-
-```powershell
-# Development mode (with auto-reload)
-npm run dev
-
-# Production mode
-npm start
-```
-
-Server will start on: **http://localhost:5000**
-
-### 5. Access Admin Panel
-
-Open your browser and go to:
-```
-http://localhost:5000/admin
-```
-
-Login with default credentials and change the password immediately.
-
-## 📡 API Endpoints
-
-### Authentication Routes (`/api/auth`)
-
-#### Register User
-```http
-POST /api/auth/register
-Content-Type: multipart/form-data
-
-Fields:
-- name: string
-- email: string
-- password: string
-- paymentMethod: "binance" | "easypaisa" | "nayapay"
-- paymentScreenshot: file (image)
-```
-
-#### Login User
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-#### Get User Status
-```http
-GET /api/auth/status?email=user@example.com
-```
-
-### User Routes (`/api/user`) - Requires Auth
-
-#### Get Profile
-```http
-GET /api/user/profile
-Authorization: Bearer <token>
-```
-
-#### Check Design Access
-```http
-GET /api/user/design-access
-Authorization: Bearer <token>
-```
-
-#### Update Profile
-```http
-PUT /api/user/profile
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "New Name"
-}
-```
-
-### Admin Routes (`/api/admin`)
-
-#### Admin Login
-```http
-POST /api/admin/login
-Content-Type: application/json
-
-{
-  "email": "admin@linkedindesign.com",
-  "password": "Admin@123456"
-}
-```
-
-#### Get Dashboard (requires admin auth)
-```http
-GET /api/admin/dashboard
-Authorization: Bearer <admin_token>
-```
-
-#### Get All Users
-```http
-GET /api/admin/users?status=pending&page=1&limit=20&search=email
-Authorization: Bearer <admin_token>
-```
-
-#### Approve User
-```http
-POST /api/admin/users/:userId/approve
-Authorization: Bearer <admin_token>
-```
-
-#### Reject User
-```http
-POST /api/admin/users/:userId/reject
-Authorization: Bearer <admin_token>
-Content-Type: application/json
-
-{
-  "reason": "Payment screenshot is invalid"
-}
-```
-
-#### Delete User
-```http
-DELETE /api/admin/users/:userId
-Authorization: Bearer <admin_token>
-```
-
-## 🔐 User Access Flow
-
-### 1. Visitor (No Login)
-- Can view main website
-- Cannot access designer page
-- Can register
-
-### 2. Registered User (Pending Approval)
-- Status: `pending`
-- isApproved: `false`
-- Cannot login to designer
-- Sees: "Your account is under review"
-
-### 3. Approved User
-- Admin approves via admin panel
-- Status: `approved`
-- isApproved: `true`
-- Can login and access designer
-- Can download designs
-
-### 4. Rejected User
-- Admin rejects with reason
-- Status: `rejected`
-- Cannot access system
-- Sees rejection reason
-
-## 👨‍💼 Admin Panel Features
-
-### Dashboard
-- **Analytics Cards:**
-  - Total users
-  - Approved users
-  - Pending approvals
-  - Rejected users
-  - Active users (last 7 days)
-  - Approval rate
-
-- **Pending Users Table:**
-  - View all users waiting for approval
-  - See payment screenshots
-  - Quick approve/reject
-
-- **Recent Registrations:**
-  - Latest user signups
-  - Status overview
-
-### User Management
-- **Filter Users:**
-  - All users
-  - Pending
-  - Approved
-  - Rejected
-
-- **Search:**
-  - Search by name or email
-
-- **User Actions:**
-  - View full details
-  - View payment screenshot
-  - Approve user
-  - Reject user (with reason)
-  - Delete user
-
-- **Pagination:**
-  - 20 users per page
-  - Navigate through pages
-
-## 🔒 Security Features
-
-- ✅ Password hashing with bcryptjs
-- ✅ JWT token authentication
-- ✅ Separate admin and user tokens
-- ✅ Route protection middleware
-- ✅ Input validation
-- ✅ File upload validation (images only, max 5MB)
-- ✅ Rate limiting (100 requests per 15 minutes)
-- ✅ Helmet.js security headers
-- ✅ CORS protection
-
-## 📊 Database Models
-
-### User Schema
+### User Model
 ```javascript
 {
-  name: String (required),
-  email: String (required, unique),
-  password: String (required, hashed),
-  paymentMethod: Enum ["binance", "easypaisa", "nayapay"],
+  name: String,
+  email: String (unique),
+  password: String (hashed),
+  paymentMethod: Enum ['binance', 'easypaisa', 'nayapay'],
   paymentScreenshot: String (file path),
-  isApproved: Boolean (default: false),
-  status: Enum ["pending", "approved", "rejected"],
+  isApproved: Boolean,
+  status: Enum ['pending', 'approved', 'rejected'],
   rejectionReason: String,
+  subscriptionStartDate: Date,
+  subscriptionEndDate: Date (30 days from approval),
   lastLogin: Date,
   loginCount: Number,
   createdAt: Date,
@@ -315,178 +178,339 @@ Authorization: Bearer <admin_token>
 }
 ```
 
-### Admin Schema
+### Admin Model
 ```javascript
 {
-  email: String (required, unique),
-  password: String (required, hashed),
+  email: String (unique),
+  password: String (hashed),
   name: String,
-  role: String (default: "admin"),
+  role: String (default: 'admin'),
   lastLogin: Date,
   createdAt: Date,
   updatedAt: Date
 }
 ```
 
-## 🛠️ Environment Variables
+## 🔐 Authentication
 
-```env
-# Server
-PORT=5000
-NODE_ENV=development
+### JWT Tokens
+- **User Token**: 7-day expiration
+- **Admin Token**: 7-day expiration
+- Stored in `localStorage` on frontend
 
-# Database
-MONGODB_URI=mongodb://localhost:27017/linkedin-design-tool
+### Password Security
+- Hashed with bcryptjs (10 rounds)
+- Never returned in API responses
+- Password strength requirements enforced
 
-# JWT Secrets (CHANGE THESE!)
-JWT_SECRET=your_super_secret_jwt_key_change_this
-JWT_ADMIN_SECRET=your_admin_jwt_secret_key_change_this
-JWT_EXPIRE=7d
-
-# Admin Credentials
-ADMIN_EMAIL=admin@linkedindesign.com
-ADMIN_PASSWORD=Admin@123456
-
-# File Upload
-MAX_FILE_SIZE=5242880
-UPLOAD_PATH=./uploads/payment-screenshots
-
-# Frontend URL (for CORS)
-FRONTEND_URL=http://localhost:3000
-```
-
-## 📝 Common Tasks
-
-### View Logs
-```powershell
-# Server logs will appear in console
-# Check MongoDB connection status
-# API request logs
-```
-
-### Reset Admin Password
-1. Delete admin from database
-2. Update `.env` with new password
-3. Run `npm run seed-admin`
-
-### Clear All Users
+### Protected Routes
 ```javascript
-// Connect to MongoDB shell or use MongoDB Compass
-db.users.deleteMany({})
+// User routes require protect middleware
+router.get('/profile', protect, getProfile);
+
+// Admin routes require protectAdmin middleware
+router.get('/dashboard', protectAdmin, getDashboard);
 ```
 
-### View Uploaded Screenshots
-Files are stored in: `backend/uploads/payment-screenshots/`
+## 📤 File Upload
+
+### Configuration
+- **Max File Size**: 5MB
+- **Allowed Types**: JPEG, PNG
+- **Storage**: `uploads/payment-screenshots/`
+- **Naming**: UUID + original extension
+
+### Security
+- File type validation
+- File size limits
+- Sanitized filenames
+- Served via static middleware
+
+## 🔒 Security Features
+
+### Helmet.js
+- Content Security Policy configured
+- XSS protection
+- MIME type sniffing prevention
+- Clickjacking protection
+
+### Rate Limiting
+- 100 requests per 15 minutes per IP
+- Applied to `/api/*` routes
+
+### CORS
+- Configurable origin
+- Credentials support
+- Options pre-flight handling
+
+### Input Validation
+- Email format validation
+- Password strength requirements
+- File type checking
+- Request body sanitization
+
+## 📊 API Response Format
+
+### Success Response
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": { ... },
+  "token": "jwt-token-here"
+}
+```
+
+### Error Response
+```json
+{
+  "success": false,
+  "message": "Error description",
+  "error": "Detailed error message"
+}
+```
+
+## 🔧 NPM Scripts
+
+```bash
+npm start          # Start server
+npm run dev        # Start with nodemon (auto-reload)
+npm run seed       # Create admin user
+```
+
+## 🌐 Admin Panel Access
+
+**URL:** `http://localhost:5000/admin`
+
+**Features:**
+- Secure login page
+- Dashboard with analytics:
+  - Total users
+  - Approved users
+  - Pending approvals
+  - Rejected users
+  - Active users (7 days)
+  - Approval rate
+- Pending users table with approve/reject
+- All users management with filters
+- User details modal
+- Subscription renewal tracking
+
+## 📈 Dashboard Analytics
+
+- **Total Users**: All registered users
+- **Approved Users**: Users with access
+- **Pending Users**: Awaiting approval
+- **Rejected Users**: Denied access
+- **Active Users**: Logged in last 7 days
+- **Approval Rate**: Percentage approved
+
+## 🔄 User Approval Workflow
+
+1. User registers with payment screenshot
+2. Status set to `pending`
+3. Admin reviews in dashboard
+4. Admin approves or rejects:
+   - **Approve**: Sets `status='approved'`, `subscriptionStartDate=now`, `subscriptionEndDate=now+30days`
+   - **Reject**: Sets `status='rejected'`, stores reason
+5. User can login if approved
+
+## 📅 Subscription System
+
+- **Duration**: 30 days from approval
+- **Start Date**: When admin approves
+- **End Date**: Start date + 30 days
+- **Renewal**: Manual (admin re-approves)
+- **Display**: Shows days left in admin panel
 
 ## 🐛 Troubleshooting
 
 ### MongoDB Connection Error
-- Ensure MongoDB is running
-- Check connection string in `.env`
-- For Atlas, whitelist your IP address
+```bash
+# Start MongoDB service
+# Windows:
+net start MongoDB
 
-### Cannot Upload Files
-- Check `uploads/payment-screenshots/` directory exists
+# macOS/Linux:
+sudo systemctl start mongod
+```
+
+### Port Already in Use
+```bash
+# Change PORT in .env file
+PORT=5001
+```
+
+### Admin Can't Login
+```bash
+# Re-run seed script
+npm run seed
+```
+
+### File Upload Fails
+- Check `uploads/` folder exists
 - Verify file size < 5MB
-- Ensure file is an image (jpg, png, gif)
+- Ensure file is JPEG/PNG
 
-### JWT Token Errors
-- Token expired - user must login again
-- Invalid token - check JWT_SECRET matches
+## 🚀 Deployment
 
-### Admin Cannot Login
-- Verify admin exists: `npm run seed-admin`
-- Check admin credentials in `.env`
-- Clear browser localStorage
+### Environment Setup
+1. Set `NODE_ENV=production` in `.env`
+2. Change all secrets and passwords
+3. Use MongoDB Atlas for production database
+4. Set strong JWT secrets
+5. Configure CORS for production domain
 
-## 🔄 Integration with Frontend
+### Platform Guides
 
-### Update Frontend URLs
-In your frontend JavaScript files, update the API base URL:
+#### DigitalOcean (Recommended)
+```bash
+# Install Node.js 18
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-```javascript
-const API_BASE = 'http://localhost:5000';
+# Install PM2
+sudo npm install -g pm2
+
+# Clone and setup
+git clone YOUR_REPO
+cd backend
+npm install
+cp .env.example .env
+# Edit .env with production values
+
+# Start with PM2
+pm2 start server.js --name linkedin-backend
+pm2 save
+pm2 startup
 ```
 
-### Register Form Integration
-```javascript
-const formData = new FormData();
-formData.append('name', name);
-formData.append('email', email);
-formData.append('password', password);
-formData.append('paymentMethod', paymentMethod);
-formData.append('paymentScreenshot', file);
+#### Heroku
+```bash
+# Create app
+heroku create your-app-name
 
-const response = await fetch('http://localhost:5000/api/auth/register', {
-    method: 'POST',
-    body: formData
-});
+# Add MongoDB addon
+heroku addons:create mongolab
+
+# Set environment variables
+heroku config:set JWT_SECRET=your-secret
+heroku config:set ADMIN_EMAIL=admin@example.com
+
+# Deploy
+git push heroku main
 ```
 
-### Login Integration
-```javascript
-const response = await fetch('http://localhost:5000/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-});
-
-const data = await response.json();
-localStorage.setItem('userToken', data.token);
+### SSL/HTTPS
+Use Let's Encrypt with Nginx:
+```bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com
 ```
 
-### Protect Designer Page
+## 🔐 Production Security Checklist
+
+- [ ] Change all `.env` secrets
+- [ ] Change admin password
+- [ ] Use MongoDB Atlas (not local)
+- [ ] Enable MongoDB authentication
+- [ ] Set strong JWT secrets (32+ characters)
+- [ ] Configure CORS for production domain only
+- [ ] Enable HTTPS/SSL
+- [ ] Set up firewall rules
+- [ ] Regular backups
+- [ ] Monitor server logs
+- [ ] Update dependencies regularly
+- [ ] Use environment variables (never hardcode)
+
+## 📝 Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| MONGODB_URI | Database connection string | mongodb://localhost:27017/dbname |
+| JWT_SECRET | User token secret | random-32-char-string |
+| JWT_EXPIRE | Token expiration | 7d |
+| ADMIN_JWT_SECRET | Admin token secret | random-32-char-string |
+| ADMIN_EMAIL | Default admin email | admin@example.com |
+| ADMIN_PASSWORD | Default admin password | SecurePassword123! |
+| PORT | Server port | 5000 |
+| NODE_ENV | Environment | development/production |
+| FRONTEND_URL | Frontend domain | http://localhost:5000 |
+
+## 🛠️ Technologies Used
+
+- **Node.js** - Runtime
+- **Express.js** - Web framework
+- **MongoDB** - Database
+- **Mongoose** - ODM
+- **JWT** - Authentication
+- **bcryptjs** - Password hashing
+- **Multer** - File upload
+- **Helmet** - Security headers
+- **CORS** - Cross-origin requests
+- **Express Rate Limit** - API throttling
+- **dotenv** - Environment config
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -m 'Add feature'`
+4. Push to branch: `git push origin feature-name`
+5. Submit pull request
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+## 👨‍💻 Developer Notes
+
+### Adding New Routes
 ```javascript
-const token = localStorage.getItem('userToken');
+// 1. Create controller
+exports.newFeature = async (req, res) => { ... };
 
-const response = await fetch('http://localhost:5000/api/user/design-access', {
-    headers: { 'Authorization': `Bearer ${token}` }
-});
+// 2. Add to routes file
+router.post('/feature', protect, newFeature);
 
-if (!response.ok) {
-    // Redirect to login or show error
-    window.location.href = 'login.html';
+// 3. Test endpoint
+```
+
+### Database Queries
+```javascript
+// Always use try-catch
+try {
+  const users = await User.find({ status: 'approved' });
+  res.json({ success: true, data: users });
+} catch (error) {
+  res.status(500).json({ success: false, error: error.message });
 }
 ```
 
-## 📦 Production Deployment
+## 🔍 Testing
 
-### 1. Update Environment Variables
-```env
-NODE_ENV=production
-MONGODB_URI=<your_production_mongodb_url>
-JWT_SECRET=<strong_random_secret>
-JWT_ADMIN_SECRET=<strong_random_secret>
-FRONTEND_URL=<your_frontend_domain>
+### Manual Testing
+```bash
+# Health check
+curl http://localhost:5000/api/health
+
+# User registration
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test","email":"test@example.com","password":"Test@123"}'
+
+# User login
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"Test@123"}'
 ```
-
-### 2. Security Checklist
-- [ ] Change all default passwords
-- [ ] Use strong JWT secrets
-- [ ] Enable HTTPS
-- [ ] Set secure CORS policy
-- [ ] Configure MongoDB authentication
-- [ ] Set up proper logging
-- [ ] Configure backup strategy
-
-### 3. Deployment Options
-- **Heroku:** Easy deployment with MongoDB Atlas
-- **DigitalOcean:** VPS with PM2 process manager
-- **AWS:** EC2 + RDS/DocumentDB
-- **Railway/Render:** Simple deployment platforms
 
 ## 📞 Support
 
 For issues or questions:
-1. Check the troubleshooting section
-2. Review API documentation
-3. Check MongoDB connection
-4. Verify environment variables
-
-## 📄 License
-
-This backend system is part of the LinkedIn Design Tool project.
+- Create an issue on GitHub
+- Email: support@example.com
 
 ---
 
-**Built with Node.js, Express, MongoDB, and JWT Authentication**
+**Built with ❤️ for LinkedIn content creators**
